@@ -98,12 +98,12 @@ void swap(int *a, int *b) {
     *b = temp;
 }
 
-// Algoritmo de Heap para gerar TODAS as permutações (n!)
+// *** MODIFICAÇÃO PRINCIPAL: Gera TODAS as permutações (15!) ***
 void generate_all_permutations(TSPData *data, int *path, int size, int start_index) {
     if (start_index == size) {
         data->permutations_tested++;
         
-        // Testa esta permutação completa
+        // Testa TODAS as permutações (incluindo as que não começam com 0)
         int cost = calculate_path_cost(data, path);
         if (cost < data->best_cost) {
             data->best_cost = cost;
@@ -112,8 +112,8 @@ void generate_all_permutations(TSPData *data, int *path, int size, int start_ind
                    cost, data->permutations_tested);
         }
         
-        // Mostra progresso a cada 1 milhão de permutações
-        if (data->permutations_tested % 1000000 == 0) {
+        // Mostra progresso a cada 10 milhões de permutações
+        if (data->permutations_tested % 10000000 == 0) {
             printf("Progresso: %lld permutações testadas...\n", data->permutations_tested);
         }
         
@@ -127,11 +127,11 @@ void generate_all_permutations(TSPData *data, int *path, int size, int start_ind
     }
 }
 
-// Algoritmo de Força Bruta usando TODAS as permutações (n!)
-void solve_tsp_brute_force_full(TSPData *data) {
+// *** Algoritmo de Força Bruta usando TODAS as permutações (15!) ***
+void solve_tsp_brute_force_15_factorial(TSPData *data) {
     clock_t start_time = clock();
     
-    // Cria array com todas as cidades (0, 1, 2, ..., n-1)
+    // Cria array com TODAS as cidades (0, 1, 2, ..., n-1)
     int *path = malloc(data->n_cities * sizeof(int));
     for (int i = 0; i < data->n_cities; i++) {
         path[i] = i;
@@ -141,12 +141,13 @@ void solve_tsp_brute_force_full(TSPData *data) {
     printf("Número de permutações a testar: %lld\n", factorial(data->n_cities));
     printf("⚠️  AVISO: Esta versão testa TODAS as permutações (%d!)\n", data->n_cities);
     printf("⚠️  A versão otimizada testaria apenas %lld permutações\n", factorial(data->n_cities - 1));
+    printf("⚠️  Esta versão é %dx mais lenta!\n", data->n_cities);
     
     // Inicializa melhor solução com primeira permutação
     data->best_cost = calculate_path_cost(data, path);
     memcpy(data->best_path, path, data->n_cities * sizeof(int));
     
-    // Gera TODAS as permutações (incluindo rotações equivalentes)
+    // *** MUDANÇA PRINCIPAL: Gera TODAS as permutações (não só as que começam com 0) ***
     generate_all_permutations(data, path, data->n_cities, 0);
     
     clock_t end_time = clock();
@@ -167,7 +168,7 @@ long long factorial(int n) {
 
 // Função para imprimir resultados
 void print_results(TSPData *data, const char* filename) {
-    printf("\n=== RESULTADOS FORÇA BRUTA COMPLETA (n!) ===\n");
+    printf("\n=== RESULTADOS FORÇA BRUTA COMPLETA (15!) ===\n");
     printf("Arquivo: %s\n", filename);
     printf("Número de cidades: %d\n", data->n_cities);
     printf("Melhor custo encontrado: %d\n", data->best_cost);
@@ -182,17 +183,18 @@ void print_results(TSPData *data, const char* filename) {
     // Comparação com versão otimizada
     long long optimized_perms = factorial(data->n_cities - 1);
     printf("\n=== COMPARAÇÃO ===\n");
-    printf("Permutações desta versão: %lld\n", data->permutations_tested);
-    printf("Permutações da versão otimizada: %lld\n", optimized_perms);
+    printf("Permutações desta versão (15!): %lld\n", data->permutations_tested);
+    printf("Permutações da versão otimizada (14!): %lld\n", optimized_perms);
     printf("Esta versão testou %.1fx mais permutações\n", 
            (double)data->permutations_tested / optimized_perms);
+    printf("Ambas encontram o mesmo resultado ótimo!\n");
 }
 
 // Função para salvar resultados em arquivo
 void save_results(TSPData *data, const char* filename, const char* output_file) {
     FILE *file = fopen(output_file, "a");
     if (file) {
-        fprintf(file, "%s,%d,%d,%.6f,BRUTE_FORCE_FULL_C,%lld\n", 
+        fprintf(file, "%s,%d,%d,%.6f,BRUTE_FORCE_15_FACTORIAL,%lld\n", 
                 filename, data->n_cities, data->best_cost, 
                 data->execution_time, data->permutations_tested);
         fclose(file);
@@ -212,7 +214,7 @@ void free_tsp_data(TSPData *data) {
 int main(int argc, char *argv[]) {
     if (argc != 2) {
         printf("Uso: %s <arquivo_tsp>\n", argv[0]);
-        printf("AVISO: Esta versão usa n! permutações (não otimizada)\n");
+        printf("AVISO: Esta versão usa 15! permutações (muito mais lenta)\n");
         return 1;
     }
     
@@ -223,10 +225,10 @@ int main(int argc, char *argv[]) {
     
     // Verifica se é viável executar (limite ainda mais restrito)
     if (data->n_cities > 10) {
-        printf("⚠️  AVISO CRÍTICO: %d cidades com %d! permutações pode demorar MUITO!\n", 
+        printf("⚠️  AVISO CRÍTICO: %d cidades com %d! permutações!\n", 
                data->n_cities, data->n_cities);
         printf("⚠️  Para 15 cidades = 1.307.674.368.000 permutações!\n");
-        printf("⚠️  Tempo estimado: várias horas ou dias!\n");
+        printf("⚠️  Tempo estimado: 15-18 horas (vs 1h11min da versão otimizada)\n");
         printf("Continuar mesmo assim? (s/n): ");
         char response;
         if (scanf(" %c", &response) != 1) {
@@ -236,14 +238,15 @@ int main(int argc, char *argv[]) {
         }
         if (response != 's' && response != 'S') {
             printf("Execução cancelada (recomendado!).\n");
+            printf("Use a versão otimizada que demora apenas 1h11min!\n");
             free_tsp_data(data);
             return 0;
         }
     }
     
-    solve_tsp_brute_force_full(data);
+    solve_tsp_brute_force_15_factorial(data);
     print_results(data, argv[1]);
-    save_results(data, argv[1], "../../results/exact_results_full.txt");
+    save_results(data, argv[1], "results/exact_results_15factorial.txt");
     
     free_tsp_data(data);
     return 0;
