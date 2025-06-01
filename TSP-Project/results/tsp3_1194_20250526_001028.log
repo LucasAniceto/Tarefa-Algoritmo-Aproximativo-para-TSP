@@ -1,7 +1,0 @@
-=== EXECUÇÃO tsp3_1194.txt - Mon May 26 00:10:28 -03 2025 ===
-Comando: ./bin/brute_force data/tsp3_1194.txt
-Custo esperado: 1194
-=== INÍCIO SAÍDA ===
-=== FIM SAÍDA ===
-Exit code: 130
-Término: Mon May 26 00:17:12 -03 2025

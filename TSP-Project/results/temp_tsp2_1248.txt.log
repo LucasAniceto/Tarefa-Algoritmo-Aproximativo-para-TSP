@@ -1,9 +1,0 @@
-Iniciando força bruta para 6 cidades...
-Número de permutações a testar: 120
-
-=== RESULTADOS FORÇA BRUTA ===
-Arquivo: data/tsp2_1248.txt
-Número de cidades: 6
-Melhor custo encontrado: 1248
-Tempo de execução: 0.000005 segundos
-Melhor caminho: 0 1 2 3 4 5 
