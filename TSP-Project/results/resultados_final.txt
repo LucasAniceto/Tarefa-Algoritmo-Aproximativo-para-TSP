@@ -1,0 +1,5 @@
+# Resultados Força Bruta - Sun May 25 23:58:03 -03 2025
+Arquivo,Cidades,Custo_Encontrado,Custo_Esperado,Tempo_Segundos,Status
+tsp2_1248.txt,6,1248,1248,0.000005,OPTIMAL
+tsp1_253.txt,11,253,253,0.053542,OPTIMAL
+tsp3_1194.txt,15,,1194,,SUCCESS

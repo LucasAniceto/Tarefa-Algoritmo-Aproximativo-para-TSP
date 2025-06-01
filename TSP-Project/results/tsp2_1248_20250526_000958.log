@@ -1,0 +1,16 @@
+=== EXECUÇÃO tsp2_1248.txt - Mon May 26 00:09:58 -03 2025 ===
+Comando: ./bin/brute_force data/tsp2_1248.txt
+Custo esperado: 1248
+=== INÍCIO SAÍDA ===
+Iniciando força bruta para 6 cidades...
+Número de permutações a testar: 120
+
+=== RESULTADOS FORÇA BRUTA ===
+Arquivo: data/tsp2_1248.txt
+Número de cidades: 6
+Melhor custo encontrado: 1248
+Tempo de execução: 0.000005 segundos
+Melhor caminho: 0 1 2 3 4 5 
+=== FIM SAÍDA ===
+Exit code: 0
+Término: Mon May 26 00:09:58 -03 2025

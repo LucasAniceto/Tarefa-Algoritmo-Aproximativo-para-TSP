@@ -1,0 +1,13 @@
+=== DEBUG TSP3 - Mon May 26 00:02:26 -03 2025 ===
+Comando: ./bin/brute_force data/tsp3_1194.txt
+PID: 635
+Diretório: /home/luybi/TSP-Project
+Usuário: luybi
+Sistema: Linux Rizen5 5.15.167.4-microsoft-standard-WSL2 #1 SMP Tue Nov 5 00:21:55 UTC 2024 x86_64 x86_64 x86_64 GNU/Linux
+Memória livre:                total        used        free      shared  buff/cache   available
+Mem:           15511         662       14913           3         191       14849
+Swap:           4096           0        4096
+=== INÍCIO EXECUÇÃO ===
+AVISO: 15 cidades pode demorar muito! Continuar? (s/n): === FIM EXECUÇÃO ===
+Exit code: 0
+Fim às: Mon May 26 00:04:33 -03 2025

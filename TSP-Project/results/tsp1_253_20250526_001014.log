@@ -1,0 +1,16 @@
+=== EXECUÇÃO tsp1_253.txt - Mon May 26 00:10:14 -03 2025 ===
+Comando: ./bin/brute_force data/tsp1_253.txt
+Custo esperado: 253
+=== INÍCIO SAÍDA ===
+Iniciando força bruta para 11 cidades...
+Número de permutações a testar: 3628800
+
+=== RESULTADOS FORÇA BRUTA ===
+Arquivo: data/tsp1_253.txt
+Número de cidades: 11
+Melhor custo encontrado: 253
+Tempo de execução: 0.052783 segundos
+Melhor caminho: 0 7 4 3 9 5 2 6 1 10 8 
+=== FIM SAÍDA ===
+Exit code: 0
+Término: Mon May 26 00:10:14 -03 2025

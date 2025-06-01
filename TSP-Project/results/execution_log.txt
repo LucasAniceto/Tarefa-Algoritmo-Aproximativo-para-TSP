@@ -1,0 +1,31 @@
+=== EXECUTANDO tsp1_253.txt às 2025-05-25 23:59:31 ===
+=== OUTPUT DE tsp1_253.txt ===
+Iniciando força bruta para 11 cidades...
+Número de permutações a testar: 3628800
+
+=== RESULTADOS FORÇA BRUTA ===
+Arquivo: data/tsp1_253.txt
+Número de cidades: 11
+Melhor custo encontrado: 253
+Tempo de execução: 0.052508 segundos
+Melhor caminho: 0 7 4 3 9 5 2 6 1 10 8 
+=== FIM OUTPUT tsp1_253.txt ===
+
+=== EXECUTANDO tsp2_1248.txt às 2025-05-25 23:59:46 ===
+=== OUTPUT DE tsp2_1248.txt ===
+Iniciando força bruta para 6 cidades...
+Número de permutações a testar: 120
+
+=== RESULTADOS FORÇA BRUTA ===
+Arquivo: data/tsp2_1248.txt
+Número de cidades: 6
+Melhor custo encontrado: 1248
+Tempo de execução: 0.000006 segundos
+Melhor caminho: 0 1 2 3 4 5 
+=== FIM OUTPUT tsp2_1248.txt ===
+
+=== EXECUTANDO tsp3_1194.txt às 2025-05-25 23:59:52 ===
+=== OUTPUT DE tsp3_1194.txt ===
+AVISO: 15 cidades pode demorar muito! Continuar? (s/n): Erro ao ler resposta
+=== FIM OUTPUT tsp3_1194.txt ===
+
