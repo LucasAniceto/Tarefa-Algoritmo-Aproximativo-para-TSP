@@ -5,10 +5,6 @@ from itertools import permutations
 from typing import List, Tuple
 
 class TSPBruteForceNFactorial:
-    """
-    Implementação de Força Bruta para TSP usando n! permutações
-    NÃO usa a otimização de fixar a primeira cidade
-    """
     
     def __init__(self, filename: str):
         self.filename = filename
@@ -20,22 +16,17 @@ class TSPBruteForceNFactorial:
         self.load_tsp_file()
         
     def load_tsp_file(self):
-        """Carrega arquivo TSP e constrói matriz de adjacência"""
         try:
             with open(self.filename, 'r') as file:
                 lines = file.readlines()
                 
-            # Remove linhas vazias e espaços
             lines = [line.strip() for line in lines if line.strip()]
             
-            # Primeira linha determina número de cidades
             first_row = list(map(int, lines[0].split()))
             self.n_cities = len(first_row)
             
-            # Inicializa matriz
             self.matrix = []
             
-            # Preenche matriz
             for line in lines:
                 row = list(map(int, line.split()))
                 if len(row) == self.n_cities:
@@ -54,16 +45,13 @@ class TSPBruteForceNFactorial:
             sys.exit(1)
     
     def calculate_path_cost(self, path: List[int]) -> int:
-        """Calcula custo total de um caminho"""
         total_cost = 0
         for i in range(len(path) - 1):
             total_cost += self.matrix[path[i]][path[i + 1]]
-        # Retorna ao início
         total_cost += self.matrix[path[-1]][path[0]]
         return total_cost
     
     def factorial(self, n: int) -> int:
-        """Calcula fatorial"""
         if n <= 1:
             return 1
         result = 1
@@ -71,11 +59,8 @@ class TSPBruteForceNFactorial:
             result *= i
         return result
     
+    # Resolve TSP usando força bruta SEM OTIMIZAÇÃO - usa n! permutações
     def solve(self) -> dict:
-        """
-        Resolve TSP usando força bruta com n! permutações
-        DIFERENÇA PRINCIPAL: Testa TODAS as permutações, não só as que começam com cidade 0
-        """
         print(f"\n=== Iniciando Força Bruta n! Python para {self.n_cities} cidades ===")
         
         if self.n_cities > 10:
@@ -95,26 +80,21 @@ class TSPBruteForceNFactorial:
         
         start_time = time.time()
         
-        # DIFERENÇA PRINCIPAL: Usa TODAS as cidades, não fixa a primeira
+        # SEM OTIMIZAÇÃO: usa TODAS as cidades, não fixa a primeira
         all_cities = list(range(self.n_cities))
         
-        # Testa todas as permutações (incluindo rotações)
         for perm in permutations(all_cities):
             self.permutations_tested += 1
             
-            # Converte tupla para lista
             path = list(perm)
             
-            # Calcula custo
             cost = self.calculate_path_cost(path)
             
-            # Atualiza melhor solução se necessário
             if cost < self.best_cost:
                 self.best_cost = cost
                 self.best_path = path.copy()
                 print(f"Nova melhor solução encontrada: {cost} (permutação {self.permutations_tested:,})")
             
-            # Mostra progresso a cada 100.000 permutações
             if self.permutations_tested % 100_000 == 0:
                 elapsed = time.time() - start_time
                 rate = self.permutations_tested / elapsed if elapsed > 0 else 0
@@ -132,7 +112,6 @@ class TSPBruteForceNFactorial:
         if self.permutations_tested != expected_permutations:
             print(f"⚠️  AVISO: Número de permutações não confere!")
         
-        # Extrai valor ótimo do nome do arquivo
         optimal_value = self.get_optimal_value()
         
         result = {
@@ -151,7 +130,6 @@ class TSPBruteForceNFactorial:
         return result
     
     def get_optimal_value(self) -> int:
-        """Extrai valor ótimo do nome do arquivo"""
         try:
             filename = self.filename.split('/')[-1]
             if '_' in filename and '.' in filename:
@@ -164,7 +142,6 @@ class TSPBruteForceNFactorial:
         return -1
     
     def print_results(self, result: dict):
-        """Imprime resultados formatados com comparação"""
         print(f"\n=== RESULTADOS FORÇA BRUTA n! PYTHON ===")
         print(f"Arquivo: {result['filename']}")
         print(f"Número de cidades: {result['n_cities']}")
@@ -196,7 +173,6 @@ class TSPBruteForceNFactorial:
         print(f"Ambas encontram o mesmo resultado ótimo: {result['best_cost']}")
     
     def save_results(self, result: dict, output_file: str = "results/exact_results_n_factorial.txt"):
-        """Salva resultados em arquivo CSV"""
         os.makedirs(os.path.dirname(output_file), exist_ok=True)
         
         try:
@@ -208,7 +184,6 @@ class TSPBruteForceNFactorial:
             print(f"Erro ao salvar resultados: {e}")
 
 def main():
-    """Função principal para teste isolado"""
     if len(sys.argv) != 2:
         print("Uso: python brute_force_n_factorial.py <arquivo_tsp>")
         print("")

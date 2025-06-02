@@ -1,10 +1,3 @@
-#!/usr/bin/env python3
-"""
-Implementação do algoritmo Branch and Bound para TSP em Python
-*** VERSÃO SEM OTIMIZAÇÃO: USA N! PERMUTAÇÕES ***
-Para demonstrar o impacto das otimizações básicas
-"""
-
 import time
 import sys
 import os
@@ -12,20 +5,15 @@ import math
 from typing import List, Optional
 
 class TSPNodeUnoptimized:
-    """Representa um nó na árvore de busca (versão sem otimização)"""
     
     def __init__(self, n_cities: int):
-        self.path = [0] * n_cities  # Caminho atual
-        self.visited = [False] * n_cities  # Cidades visitadas
-        self.current_cost = 0  # Custo atual do caminho
-        self.level = 0  # Nível na árvore
-        self.bound = 0  # Lower bound calculado
+        self.path = [0] * n_cities
+        self.visited = [False] * n_cities
+        self.current_cost = 0
+        self.level = 0
+        self.bound = 0
 
 class TSPBranchBoundUnoptimized:
-    """
-    Branch and Bound SEM OTIMIZAÇÃO - Usa n! permutações
-    Para comparar com versão otimizada (n-1)!
-    """
     
     def __init__(self, filename: str):
         self.filename = filename
@@ -39,7 +27,6 @@ class TSPBranchBoundUnoptimized:
         self.load_tsp_file()
         
     def load_tsp_file(self):
-        """Carrega arquivo TSP (mesmo método das outras versões)"""
         try:
             with open(self.filename, 'r') as file:
                 lines = file.readlines()
@@ -66,14 +53,10 @@ class TSPBranchBoundUnoptimized:
             print(f"Erro ao carregar arquivo: {e}")
             sys.exit(1)
     
+    # Lower bound SEM OTIMIZAÇÕES SOFISTICADAS
     def calculate_bound_unoptimized(self, node: TSPNodeUnoptimized) -> float:
-        """
-        Lower bound SEM OTIMIZAÇÕES SOFISTICADAS
-        Versão mais simples e menos eficiente
-        """
         bound = node.current_cost
         
-        # Para cada cidade não visitada, adiciona menor aresta
         for i in range(self.n_cities):
             if not node.visited[i]:
                 min_edge = float('inf')
@@ -86,22 +69,16 @@ class TSPBranchBoundUnoptimized:
         
         return bound
     
+    # Função que explora TODAS as permutações (N!)
     def branch_and_bound_recursive_full(self, current_node: TSPNodeUnoptimized):
-        """
-        *** FUNÇÃO QUE EXPLORA TODAS AS PERMUTAÇÕES (N!) ***
-        Diferente da versão otimizada que fixa a primeira cidade
-        """
         self.nodes_explored += 1
         
-        # Mostra progresso a cada 100,000 nós
         if self.nodes_explored % 100000 == 0:
             pruning_rate = (self.nodes_pruned / (self.nodes_explored + self.nodes_pruned)) * 100
             print(f"Progresso: {self.nodes_explored:,} nós explorados, "
                   f"{self.nodes_pruned:,} podados ({pruning_rate:.2f}% poda)")
         
-        # Se chegamos ao final do caminho
         if current_node.level == self.n_cities:
-            # Calcula custo de volta ao início
             final_cost = current_node.current_cost + \
                         self.matrix[current_node.path[current_node.level - 1]][current_node.path[0]]
             
@@ -111,47 +88,36 @@ class TSPBranchBoundUnoptimized:
                 print(f"Nova melhor solução: {self.best_cost} (nó {self.nodes_explored:,})")
             return
         
-        # *** MUDANÇA PRINCIPAL: EXPLORA TODAS AS CIDADES (0 até n-1) ***
-        # Versão otimizada começaria de 1 (fixando cidade 0)
-        # Esta versão testa TODAS as permutações, incluindo diferentes partidas
+        # SEM OTIMIZAÇÃO: explora TODAS as cidades (0 até n-1)
         for i in range(self.n_cities):
             if not current_node.visited[i]:
-                # Cria novo nó
                 next_node = TSPNodeUnoptimized(self.n_cities)
                 
-                # Copia estado atual
                 next_node.path = current_node.path.copy()
                 next_node.visited = current_node.visited.copy()
                 
-                # Atualiza novo estado
                 next_node.path[current_node.level] = i
                 next_node.visited[i] = True
                 next_node.level = current_node.level + 1
                 
-                # Calcula custo (cuidado com primeiro nível)
                 if current_node.level == 0:
-                    next_node.current_cost = 0  # Primeira cidade, sem custo
+                    next_node.current_cost = 0
                 else:
                     next_node.current_cost = current_node.current_cost + \
                                            self.matrix[current_node.path[current_node.level - 1]][i]
                 
-                # Calcula bound (versão menos otimizada)
                 next_node.bound = self.calculate_bound_unoptimized(next_node)
                 
-                # Poda: se bound >= melhor solução atual, não explora
                 if next_node.bound < self.best_cost:
                     self.branch_and_bound_recursive_full(next_node)
                 else:
                     self.nodes_pruned += 1
     
+    # Algoritmo principal que usa N! permutações
     def solve(self) -> dict:
-        """
-        *** ALGORITMO PRINCIPAL QUE USA N! PERMUTAÇÕES ***
-        """
         print("=== INICIANDO BRANCH AND BOUND N! (SEM OTIMIZAÇÃO) ===")
         print(f"Número de cidades: {self.n_cities}")
         
-        # Calcula fatorial para mostrar magnitude
         factorial_full = math.factorial(self.n_cities)
         factorial_optimized = math.factorial(self.n_cities - 1)
         
@@ -170,25 +136,21 @@ class TSPBranchBoundUnoptimized:
         print("\nIniciando busca...")
         start_time = time.time()
         
-        # *** INICIALIZA NÓ RAIZ VAZIO (SEM FIXAR CIDADE) ***
+        # Inicializa nó raiz VAZIO (sem fixar cidade)
         root = TSPNodeUnoptimized(self.n_cities)
         
-        # Diferente da versão otimizada, não fixa cidade 0
-        # Todas as cidades estão disponíveis inicialmente
         for i in range(self.n_cities):
-            root.visited[i] = False  # Nenhuma cidade visitada
+            root.visited[i] = False
         
         root.current_cost = 0
-        root.level = 0  # Começa do nível 0 (sem nenhuma cidade)
+        root.level = 0
         root.bound = self.calculate_bound_unoptimized(root)
         
-        # Inicia busca recursiva (explorará TODAS as permutações)
         self.branch_and_bound_recursive_full(root)
         
         end_time = time.time()
         self.execution_time = end_time - start_time
         
-        # Extrai valor ótimo do nome do arquivo
         optimal_value = self.get_optimal_value()
         
         result = {
@@ -211,7 +173,6 @@ class TSPBranchBoundUnoptimized:
         return result
     
     def get_optimal_value(self) -> int:
-        """Extrai valor ótimo do nome do arquivo"""
         try:
             filename = self.filename.split('/')[-1]
             if '_' in filename and '.' in filename:
@@ -224,7 +185,6 @@ class TSPBranchBoundUnoptimized:
         return -1
     
     def print_results(self, result: dict):
-        """Imprime resultados formatados com comparação"""
         print(f"\n=== RESULTADOS BRANCH AND BOUND N! (SEM OTIMIZAÇÃO) ===")
         print(f"Arquivo: {result['filename']}")
         print(f"Número de cidades: {result['n_cities']}")
@@ -251,7 +211,6 @@ class TSPBranchBoundUnoptimized:
         print(f"Eficiência da poda: {100 - (result['nodes_explored'] / result['factorial_full']) * 100:.1f}%")
     
     def save_results(self, result: dict, output_file: str = "results/exact_results_n_factorial.txt"):
-        """Salva resultados em arquivo CSV"""
         os.makedirs(os.path.dirname(output_file), exist_ok=True)
         
         try:
@@ -263,7 +222,6 @@ class TSPBranchBoundUnoptimized:
             print(f"Erro ao salvar resultados: {e}")
 
 def main():
-    """Função principal para teste isolado"""
     if len(sys.argv) != 2:
         print("Uso: python branch_bound_unoptimized.py <arquivo_tsp>")
         print("AVISO: Esta versão usa n! permutações (sem otimização de cidade fixa)")
