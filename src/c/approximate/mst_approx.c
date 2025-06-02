@@ -19,7 +19,7 @@ typedef struct {
     int u, v, weight;
 } Edge;
 
-// Função para ler arquivo TSP (mesmo código anterior)
+// Função para ler a matriz de adjacência do arquivo
 TSPData* read_tsp_file(const char* filename) {
     FILE *file = fopen(filename, "r");
     if (!file) {
@@ -29,7 +29,6 @@ TSPData* read_tsp_file(const char* filename) {
     
     TSPData *data = malloc(sizeof(TSPData));
     
-    // Conta cidades
     char line[10000];
     if (fgets(line, sizeof(line), file) == NULL) {
         printf("Erro ao ler primeira linha\n");
@@ -47,21 +46,18 @@ TSPData* read_tsp_file(const char* filename) {
     data->n_cities = count;
     data->approx_cost = 0;
     
-    // Aloca memória
     data->matrix = malloc(data->n_cities * sizeof(int*));
     for (int i = 0; i < data->n_cities; i++) {
         data->matrix[i] = malloc(data->n_cities * sizeof(int));
     }
     data->approx_path = malloc(data->n_cities * sizeof(int));
     
-    // Lê matriz
     rewind(file);
     for (int i = 0; i < data->n_cities; i++) {
         for (int j = 0; j < data->n_cities; j++) {
             if (fscanf(file, "%d", &data->matrix[i][j]) != 1) {
                 printf("Erro ao ler matriz na posição [%d][%d]\n", i, j);
                 fclose(file);
-                // Libera memória alocada
                 for (int k = 0; k <= i; k++) {
                     free(data->matrix[k]);
                 }
@@ -83,18 +79,15 @@ int* find_mst_prim(TSPData *data) {
     int *key = malloc(data->n_cities * sizeof(int));
     bool *in_mst = malloc(data->n_cities * sizeof(bool));
     
-    // Inicialização
     for (int i = 0; i < data->n_cities; i++) {
         key[i] = INT_MAX;
         in_mst[i] = false;
     }
     
-    // Começa do vértice 0
     key[0] = 0;
     parent[0] = -1;
     
     for (int count = 0; count < data->n_cities - 1; count++) {
-        // Encontra vértice com menor chave
         int min_key = INT_MAX, min_index = -1;
         for (int v = 0; v < data->n_cities; v++) {
             if (!in_mst[v] && key[v] < min_key) {
@@ -105,7 +98,6 @@ int* find_mst_prim(TSPData *data) {
         
         in_mst[min_index] = true;
         
-        // Atualiza chaves dos vértices adjacentes
         for (int v = 0; v < data->n_cities; v++) {
             if (!in_mst[v] && data->matrix[min_index][v] < key[v]) {
                 parent[v] = min_index;
@@ -124,26 +116,20 @@ int** create_mst_adjacency_list(TSPData *data, int *mst_parent) {
     int **adj_list = malloc(data->n_cities * sizeof(int*));
     int *adj_count = calloc(data->n_cities, sizeof(int));
     
-    // Primeiro, conta quantos vizinhos cada vértice tem
     for (int i = 1; i < data->n_cities; i++) {
         adj_count[i]++;
         adj_count[mst_parent[i]]++;
     }
     
-    // Aloca memória para cada lista
     for (int i = 0; i < data->n_cities; i++) {
         adj_list[i] = malloc((adj_count[i] + 1) * sizeof(int));
-        adj_list[i][0] = 0; // Contador atual
+        adj_list[i][0] = 0;
     }
     
-    // Preenche listas de adjacência
     for (int i = 1; i < data->n_cities; i++) {
         int parent = mst_parent[i];
         
-        // Adiciona i à lista do pai
         adj_list[parent][++adj_list[parent][0]] = i;
-        
-        // Adiciona pai à lista de i
         adj_list[i][++adj_list[i][0]] = parent;
     }
     
@@ -156,7 +142,6 @@ void dfs_preorder(int **adj_list, int vertex, bool *visited, int *tour, int *tou
     visited[vertex] = true;
     tour[(*tour_index)++] = vertex;
     
-    // Visita todos os vizinhos não visitados
     for (int i = 1; i <= adj_list[vertex][0]; i++) {
         int neighbor = adj_list[vertex][i];
         if (!visited[neighbor]) {
@@ -165,40 +150,32 @@ void dfs_preorder(int **adj_list, int vertex, bool *visited, int *tour, int *tou
     }
 }
 
-// Algoritmo da Árvore (MST-based approximation)
+// Algoritmo MST - Aproximação com garantia de 2x o ótimo
 void solve_tsp_mst_approximation(TSPData *data) {
     clock_t start_time = clock();
     
     printf("Iniciando algoritmo MST para %d cidades...\n", data->n_cities);
     
-    // 1. Encontra MST usando Prim
     int *mst_parent = find_mst_prim(data);
-    
-    // 2. Cria lista de adjacência da MST
     int **adj_list = create_mst_adjacency_list(data, mst_parent);
     
-    // 3. Faz DFS preorder para obter tour
     bool *visited = calloc(data->n_cities, sizeof(bool));
     int *tour = malloc(data->n_cities * sizeof(int));
     int tour_index = 0;
     
     dfs_preorder(adj_list, 0, visited, tour, &tour_index);
     
-    // 4. Remove repetições (já temos preorder, que é o caminho aproximado)
     memcpy(data->approx_path, tour, data->n_cities * sizeof(int));
     
-    // 5. Calcula custo do tour aproximado
     data->approx_cost = 0;
     for (int i = 0; i < data->n_cities - 1; i++) {
         data->approx_cost += data->matrix[tour[i]][tour[i + 1]];
     }
-    // Volta ao início
     data->approx_cost += data->matrix[tour[data->n_cities - 1]][tour[0]];
     
     clock_t end_time = clock();
     data->execution_time = ((double)(end_time - start_time)) / CLOCKS_PER_SEC;
     
-    // Libera memória
     free(mst_parent);
     for (int i = 0; i < data->n_cities; i++) {
         free(adj_list[i]);
@@ -208,7 +185,6 @@ void solve_tsp_mst_approximation(TSPData *data) {
     free(tour);
 }
 
-// Função para imprimir resultados
 void print_results(TSPData *data, const char* filename) {
     printf("\n=== RESULTADOS MST APROXIMATIVO ===\n");
     printf("Arquivo: %s\n", filename);
@@ -221,7 +197,6 @@ void print_results(TSPData *data, const char* filename) {
     }
     printf("\n");
     
-    // Extrai valor ótimo do nome do arquivo de forma mais segura
     const char *basename = filename;
     const char *last_slash = strrchr(filename, '/');
     if (last_slash) basename = last_slash + 1;
@@ -231,7 +206,6 @@ void print_results(TSPData *data, const char* filename) {
     
     if (underscore && dot && underscore < dot) {
         int optimal = 0;
-        // Copia manualmente a substring
         int len = dot - underscore - 1;
         char optimal_str[32] = {0};
         if (len > 0 && len < 31) {
@@ -248,11 +222,9 @@ void print_results(TSPData *data, const char* filename) {
     }
 }
 
-// Função para salvar resultados
 void save_results(TSPData *data, const char* filename, const char* output_file) {
     FILE *file = fopen(output_file, "a");
     if (file) {
-        // Extrai valor ótimo de forma segura
         const char *basename = filename;
         const char *last_slash = strrchr(filename, '/');  
         if (last_slash) basename = last_slash + 1;
@@ -278,7 +250,6 @@ void save_results(TSPData *data, const char* filename, const char* output_file) 
     }
 }
 
-// Função para liberar memória
 void free_tsp_data(TSPData *data) {
     for (int i = 0; i < data->n_cities; i++) {
         free(data->matrix[i]);
