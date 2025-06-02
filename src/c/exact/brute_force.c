@@ -6,7 +6,7 @@
 
 #define MAX_CITIES 50
 
-// Declaração antecipada da função factorial
+// Declaração da função factorial
 long long factorial(int n);
 
 typedef struct {
@@ -27,7 +27,7 @@ TSPData* read_tsp_file(const char* filename) {
     
     TSPData *data = malloc(sizeof(TSPData));
     
-    // Primeiro, contamos o número de cidades lendo a primeira linha
+    // Conta o número de cidades lendo a primeira linha
     char line[10000];
     if (fgets(line, sizeof(line), file) == NULL) {
         printf("Erro ao ler primeira linha\n");
@@ -62,7 +62,7 @@ TSPData* read_tsp_file(const char* filename) {
             if (fscanf(file, "%d", &data->matrix[i][j]) != 1) {
                 printf("Erro ao ler matriz na posição [%d][%d]\n", i, j);
                 fclose(file);
-                // Libera memória alocada
+                // Libera memória
                 for (int k = 0; k <= i; k++) {
                     free(data->matrix[k]);
                 }
@@ -78,25 +78,22 @@ TSPData* read_tsp_file(const char* filename) {
     return data;
 }
 
-// Função para calcular o custo de um caminho
 int calculate_path_cost(TSPData *data, int *path) {
     int total_cost = 0;
     for (int i = 0; i < data->n_cities - 1; i++) {
         total_cost += data->matrix[path[i]][path[i + 1]];
     }
-    // Volta ao início
     total_cost += data->matrix[path[data->n_cities - 1]][path[0]];
     return total_cost;
 }
 
-// Função para trocar dois elementos
 void swap(int *a, int *b) {
     int temp = *a;
     *a = *b;
     *b = temp;
 }
 
-// Algoritmo de Heap para gerar permutações (mais eficiente que recursão simples)
+// Algoritmo de Heap para gerar permutações
 void generate_permutations(TSPData *data, int *path, int size, int start_index) {
     if (start_index == size) {
         // Reconstrói caminho completo com cidade 0 no início
@@ -125,7 +122,7 @@ void generate_permutations(TSPData *data, int *path, int size, int start_index) 
 void solve_tsp_brute_force(TSPData *data) {
     clock_t start_time = clock();
     
-    // Cria array com cidades (fixamos a cidade 0 como início)
+    // Fixa a cidade 0 como início
     int *path = malloc(data->n_cities * sizeof(int));
     for (int i = 0; i < data->n_cities; i++) {
         path[i] = i;
@@ -134,11 +131,11 @@ void solve_tsp_brute_force(TSPData *data) {
     printf("Iniciando força bruta para %d cidades...\n", data->n_cities);
     printf("Número de permutações a testar: %lld\n", factorial(data->n_cities - 1));
     
-    // Inicializa melhor solução com primeira permutação
+    // Inicializa melhor solução
     data->best_cost = calculate_path_cost(data, path);
     memcpy(data->best_path, path, data->n_cities * sizeof(int));
     
-    // Gera todas as permutações começando da cidade 1 (fixamos 0)
+    // Gera permutações começando da cidade 1 (fixa 0)
     if (data->n_cities > 1) {
         generate_permutations(data, path + 1, data->n_cities - 1, 0);
     }
@@ -149,7 +146,6 @@ void solve_tsp_brute_force(TSPData *data) {
     free(path);
 }
 
-// Função auxiliar para calcular fatorial (para estatísticas)
 long long factorial(int n) {
     if (n <= 1) return 1;
     long long result = 1;
@@ -159,7 +155,6 @@ long long factorial(int n) {
     return result;
 }
 
-// Função para imprimir resultados
 void print_results(TSPData *data, const char* filename) {
     printf("\n=== RESULTADOS FORÇA BRUTA ===\n");
     printf("Arquivo: %s\n", filename);
@@ -173,7 +168,6 @@ void print_results(TSPData *data, const char* filename) {
     printf("\n");
 }
 
-// Função para salvar resultados em arquivo
 void save_results(TSPData *data, const char* filename, const char* output_file) {
     FILE *file = fopen(output_file, "a");
     if (file) {
@@ -183,7 +177,6 @@ void save_results(TSPData *data, const char* filename, const char* output_file) 
     }
 }
 
-// Função para liberar memória
 void free_tsp_data(TSPData *data) {
     for (int i = 0; i < data->n_cities; i++) {
         free(data->matrix[i]);
@@ -204,7 +197,6 @@ int main(int argc, char *argv[]) {
         return 1;
     }
     
-    // Verifica se é viável executar (limite prático)
     if (data->n_cities > 12) {
         printf("AVISO: %d cidades pode demorar muito! Continuar? (s/n): ", data->n_cities);
         char response;
