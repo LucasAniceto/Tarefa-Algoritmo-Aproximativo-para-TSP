@@ -1,9 +1,3 @@
-#!/usr/bin/env python3
-"""
-Implementação do algoritmo Branch and Bound para TSP em Python
-Segue o mesmo padrão e estrutura do código C original
-"""
-
 import time
 import sys
 import os
@@ -11,20 +5,15 @@ from typing import List, Optional, Tuple
 import copy
 
 class TSPNode:
-    """Representa um nó na árvore de busca do Branch and Bound"""
     
     def __init__(self, n_cities: int):
-        self.path = [0] * n_cities  # Caminho atual
-        self.visited = [False] * n_cities  # Cidades visitadas
-        self.current_cost = 0  # Custo atual do caminho
-        self.level = 0  # Nível na árvore (número de cidades visitadas)
-        self.bound = 0  # Lower bound calculado
+        self.path = [0] * n_cities
+        self.visited = [False] * n_cities
+        self.current_cost = 0
+        self.level = 0
+        self.bound = 0
 
 class TSPBranchBound:
-    """
-    Implementação do algoritmo Branch and Bound para TSP
-    Segue a mesma estrutura do código C
-    """
     
     def __init__(self, filename: str):
         self.filename = filename
@@ -38,22 +27,17 @@ class TSPBranchBound:
         self.load_tsp_file()
         
     def load_tsp_file(self):
-        """Carrega arquivo TSP e constrói matriz de adjacência (mesmo padrão do C)"""
         try:
             with open(self.filename, 'r') as file:
                 lines = file.readlines()
                 
-            # Remove linhas vazias e espaços
             lines = [line.strip() for line in lines if line.strip()]
             
-            # Primeira linha determina número de cidades
             first_row = list(map(int, lines[0].split()))
             self.n_cities = len(first_row)
             
-            # Inicializa matriz
             self.matrix = []
             
-            # Preenche matriz
             for line in lines:
                 row = list(map(int, line.split()))
                 if len(row) == self.n_cities:
@@ -71,13 +55,10 @@ class TSPBranchBound:
             print(f"Erro ao carregar arquivo: {e}")
             sys.exit(1)
     
+    # Calcula lower bound usando redução de matriz
     def calculate_bound(self, node: TSPNode) -> int:
-        """
-        Calcula lower bound usando redução de matriz (mesmo algoritmo do C)
-        """
         bound = node.current_cost
         
-        # Para cada cidade não visitada, adiciona a menor aresta saindo dela
         for i in range(self.n_cities):
             if not node.visited[i] or (node.level > 0 and i == node.path[node.level - 1]):
                 min_edge = float('inf')
@@ -91,15 +72,11 @@ class TSPBranchBound:
         
         return bound
     
+    # Função recursiva do Branch and Bound
     def branch_and_bound_recursive(self, current_node: TSPNode):
-        """
-        Função recursiva do Branch and Bound (mesma lógica do C)
-        """
         self.nodes_explored += 1
         
-        # Se chegamos ao final do caminho
         if current_node.level == self.n_cities:
-            # Adiciona o custo de volta ao início
             final_cost = current_node.current_cost + \
                         self.matrix[current_node.path[current_node.level - 1]][0]
             
@@ -108,24 +85,20 @@ class TSPBranchBound:
                 self.best_path = current_node.path.copy()
             return
         
-        # Explora próximas cidades
+        # Otimização: explora apenas cidades não visitadas (exceto cidade 0 já fixada)
         for i in range(1, self.n_cities):
             if not current_node.visited[i]:
-                # Cria novo nó (equivalente ao malloc no C)
                 next_node = TSPNode(self.n_cities)
                 
-                # Copia estado atual (equivalente ao memcpy no C)
                 next_node.path = current_node.path.copy()
                 next_node.visited = current_node.visited.copy()
                 
-                # Atualiza novo estado
                 next_node.path[current_node.level] = i
                 next_node.visited[i] = True
                 next_node.level = current_node.level + 1
                 next_node.current_cost = current_node.current_cost + \
                                        self.matrix[current_node.path[current_node.level - 1]][i]
                 
-                # Calcula bound
                 next_node.bound = self.calculate_bound(next_node)
                 
                 # Poda: se bound >= melhor solução atual, não explora
@@ -134,30 +107,25 @@ class TSPBranchBound:
                 else:
                     self.nodes_pruned += 1
     
+    # Algoritmo Branch and Bound - Otimização: fixa cidade 0 como inicial
     def solve(self) -> dict:
-        """
-        Algoritmo Branch and Bound principal (mesmo padrão do C)
-        """
         print(f"Iniciando Branch and Bound para {self.n_cities} cidades...")
         start_time = time.time()
         
-        # Inicializa nó raiz (equivalente ao código C)
         root = TSPNode(self.n_cities)
         
-        # Começa da cidade 0
+        # Fixa cidade 0 como inicial
         root.path[0] = 0
         root.visited[0] = True
         root.current_cost = 0
         root.level = 1
         root.bound = self.calculate_bound(root)
         
-        # Inicia busca
         self.branch_and_bound_recursive(root)
         
         end_time = time.time()
         self.execution_time = end_time - start_time
         
-        # Extrai valor ótimo do nome do arquivo
         optimal_value = self.get_optimal_value()
         
         result = {
@@ -177,7 +145,6 @@ class TSPBranchBound:
         return result
     
     def get_optimal_value(self) -> int:
-        """Extrai valor ótimo do nome do arquivo (mesmo padrão dos outros algoritmos)"""
         try:
             filename = self.filename.split('/')[-1]
             if '_' in filename and '.' in filename:
@@ -190,7 +157,6 @@ class TSPBranchBound:
         return -1
     
     def print_results(self, result: dict):
-        """Imprime resultados formatados (mesmo padrão do C)"""
         print(f"\n=== RESULTADOS BRANCH AND BOUND ===")
         print(f"Arquivo: {result['filename']}")
         print(f"Número de cidades: {result['n_cities']}")
@@ -210,7 +176,6 @@ class TSPBranchBound:
                 print(f"⚠️ Razão: {ratio:.3f}")
     
     def save_results(self, result: dict, output_file: str = "results/exact_results.txt"):
-        """Salva resultados em arquivo CSV (mesmo formato do C)"""
         os.makedirs(os.path.dirname(output_file), exist_ok=True)
         
         try:
@@ -222,7 +187,6 @@ class TSPBranchBound:
             print(f"Erro ao salvar resultados: {e}")
 
 def main():
-    """Função principal para teste isolado (mesmo padrão do C)"""
     if len(sys.argv) != 2:
         print("Uso: python branch_bound_python.py <arquivo_tsp>")
         sys.exit(1)
