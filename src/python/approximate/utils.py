@@ -7,17 +7,15 @@ from typing import List, Dict, Tuple
 import numpy as np
 
 class TSPUtils:
-    """Classe com utilitários para análise e visualização dos resultados TSP"""
     
     @staticmethod
     def create_results_directory(base_dir: str = "../../results"):
-        """Cria diretório de resultados se não existir"""
         os.makedirs(base_dir, exist_ok=True)
         return base_dir
     
+    # Valida se arquivo TSP está no formato correto
     @staticmethod
     def validate_tsp_file(filename: str) -> bool:
-        """Valida se arquivo TSP está no formato correto"""
         try:
             with open(filename, 'r') as file:
                 lines = [line.strip() for line in file.readlines() if line.strip()]
@@ -25,20 +23,16 @@ class TSPUtils:
             if not lines:
                 return False
             
-            # Verifica primeira linha
             first_row = lines[0].split()
             n_cities = len(first_row)
             
-            # Verifica se todas as linhas têm o mesmo número de elementos
             for line in lines:
                 if len(line.split()) != n_cities:
                     return False
             
-            # Verifica se número de linhas == número de colunas
             if len(lines) != n_cities:
                 return False
             
-            # Verifica se todos são números
             for line in lines:
                 try:
                     list(map(int, line.split()))
@@ -50,9 +44,9 @@ class TSPUtils:
         except:
             return False
     
+    # Obtém informações básicas do arquivo TSP
     @staticmethod
     def get_file_info(filename: str) -> Dict:
-        """Obtém informações básicas do arquivo TSP"""
         info = {
             'filename': filename,
             'exists': os.path.exists(filename),
@@ -71,7 +65,6 @@ class TSPUtils:
                     first_line = file.readline().strip()
                     info['n_cities'] = len(first_line.split())
                 
-                # Extrai valor ótimo do nome
                 basename = os.path.basename(filename)
                 if '_' in basename and '.' in basename:
                     try:
@@ -84,12 +77,10 @@ class TSPUtils:
         
         return info
     
+    # Estima tempo de execução baseado no número de cidades
     @staticmethod
     def estimate_execution_time(n_cities: int, algorithm: str) -> str:
-        """Estima tempo de execução baseado no número de cidades"""
         if algorithm.upper() in ['BRUTE_FORCE', 'BRUTE-FORCE']:
-            # Baseado em 1 microsegundo por permutação
-            import math
             if n_cities <= 10:
                 return "< 1 segundo"
             elif n_cities <= 12:
@@ -116,7 +107,6 @@ class TSPUtils:
     
     @staticmethod
     def format_time(seconds: float) -> str:
-        """Formata tempo em formato legível"""
         if seconds < 1:
             return f"{seconds * 1000:.2f} ms"
         elif seconds < 60:
@@ -128,15 +118,14 @@ class TSPUtils:
     
     @staticmethod
     def load_results_csv(filename: str) -> pd.DataFrame:
-        """Carrega resultados de arquivo CSV"""
         try:
             return pd.read_csv(filename)
         except:
             return pd.DataFrame()
     
+    # Analisa e compara resultados exatos vs aproximativos
     @staticmethod
     def analyze_results(exact_file: str, approx_file: str) -> Dict:
-        """Analisa e compara resultados exatos vs aproximativos"""
         exact_df = TSPUtils.load_results_csv(exact_file)
         approx_df = TSPUtils.load_results_csv(approx_file)
         
@@ -146,7 +135,6 @@ class TSPUtils:
             'comparison': []
         }
         
-        # Compara resultados quando disponíveis
         for _, approx_row in approx_df.iterrows():
             filename = approx_row['filename']
             exact_matches = exact_df[exact_df['filename'] == filename]
@@ -167,9 +155,9 @@ class TSPUtils:
         
         return analysis
     
+    # Gera relatório detalhado da análise
     @staticmethod
     def generate_report(analysis: Dict, output_file: str = "../../results/analysis_report.txt"):
-        """Gera relatório detalhado da análise"""
         with open(output_file, 'w') as f:
             f.write("=== RELATÓRIO DE ANÁLISE TSP ===\n\n")
             f.write(f"Resultados exatos encontrados: {analysis['exact_results']}\n")
@@ -199,14 +187,13 @@ class TSPUtils:
                 f.write(f"Razão média de aproximação: {avg_ratio:.3f}\n")
                 f.write(f"Speedup médio: {avg_speedup:.2f}x\n")
     
+    # Gera gráficos dos resultados
     @staticmethod
     def plot_results(analysis: Dict, output_dir: str = "../../results"):
-        """Gera gráficos dos resultados"""
         if not analysis['comparison']:
             print("Não há dados suficientes para gerar gráficos")
             return
         
-        # Prepara dados
         data = analysis['comparison']
         cities = [d['n_cities'] for d in data]
         ratios = [d['approximation_ratio'] for d in data]
@@ -248,7 +235,6 @@ class TSPUtils:
         print(f"Gráficos salvos em {output_dir}/")
 
 class ProgressTracker:
-    """Classe para rastrear progresso de execução"""
     
     def __init__(self, total_tasks: int, description: str = "Progresso"):
         self.total_tasks = total_tasks
@@ -257,16 +243,13 @@ class ProgressTracker:
         self.start_time = time.time()
         
     def update(self, increment: int = 1):
-        """Atualiza progresso"""
         self.completed_tasks += increment
         self._print_progress()
         
     def _print_progress(self):
-        """Imprime barra de progresso"""
         percentage = (self.completed_tasks / self.total_tasks) * 100
         elapsed_time = time.time() - self.start_time
         
-        # Estima tempo restante
         if self.completed_tasks > 0:
             estimated_total = elapsed_time * (self.total_tasks / self.completed_tasks)
             remaining_time = estimated_total - elapsed_time
@@ -284,9 +267,7 @@ class ProgressTracker:
         if self.completed_tasks >= self.total_tasks:
             print(f'\n{self.description} concluído em {TSPUtils.format_time(elapsed_time)}')
 
-# Exemplo de uso das utilidades
 if __name__ == "__main__":
-    # Testa validação de arquivo
     test_files = [
         "../../data/tsp1_253.txt",
         "../../data/tsp2_1248.txt"

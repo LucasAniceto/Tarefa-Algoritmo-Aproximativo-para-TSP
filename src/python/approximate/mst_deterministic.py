@@ -3,7 +3,6 @@ import sys
 import os
 
 class TSPMSTFixed:
-    """Versão super simples e corrigida do MST para TSP"""
     
     def __init__(self, filename: str):
         self.filename = filename
@@ -15,11 +14,9 @@ class TSPMSTFixed:
         with open(self.filename, 'r') as file:
             lines = [line.strip() for line in file.readlines() if line.strip()]
         
-        # Primeira linha determina número de cidades
         first_row = list(map(int, lines[0].split()))
         self.n_cities = len(first_row)
         
-        # Preenche matriz
         self.matrix = []
         for line in lines:
             row = list(map(int, line.split()))
@@ -28,24 +25,20 @@ class TSPMSTFixed:
         
         print(f"Arquivo carregado: {self.n_cities} cidades")
     
+    # MST usando Prim - versão determinística
     def find_mst_simple(self):
-        """MST usando Prim - versão super simples"""
         print("=== MST SIMPLES ===")
         
-        # Inicialização
         in_mst = [False] * self.n_cities
         key = [float('inf')] * self.n_cities
         parent = [-1] * self.n_cities
         
-        # Começa do vértice 0
         key[0] = 0
         mst_edges = []
         
-        # DEVE rodar EXATAMENTE n iterações para incluir todos os vértices
         for iteration in range(self.n_cities):
             print(f"\n--- Iteração {iteration + 1} ---")
             
-            # Encontra vértice com menor key que não está na MST
             min_key = float('inf')
             min_vertex = -1
             
@@ -61,17 +54,14 @@ class TSPMSTFixed:
             print(f"Vértices disponíveis: {[v for v in range(self.n_cities) if not in_mst[v]]}")
             print(f"Escolhido: vértice {min_vertex} com key {min_key}")
             
-            # Adiciona à MST
             in_mst[min_vertex] = True
             
-            # Adiciona aresta (exceto primeira iteração)
             if parent[min_vertex] != -1:
                 mst_edges.append((parent[min_vertex], min_vertex, int(min_key)))
                 print(f"  ✅ Aresta: {parent[min_vertex]} -> {min_vertex} (peso: {int(min_key)})")
             else:
                 print(f"  🏁 Vértice inicial: {min_vertex}")
             
-            # Atualiza keys dos vizinhos
             updates = 0
             for v in range(self.n_cities):
                 if not in_mst[v] and self.matrix[min_vertex][v] < key[v]:
@@ -84,7 +74,6 @@ class TSPMSTFixed:
             if updates == 0:
                 print("    Nenhuma key atualizada")
             
-            # Estado atual
             mst_vertices = [v for v in range(self.n_cities) if in_mst[v]]
             remaining = [v for v in range(self.n_cities) if not in_mst[v]]
             print(f"  Na MST: {mst_vertices} ({len(mst_vertices)}/{self.n_cities})")
@@ -94,7 +83,6 @@ class TSPMSTFixed:
         return mst_edges
     
     def build_adjacency_from_mst(self, mst_edges):
-        """Constrói lista de adjacência da MST"""
         adj_list = [[] for _ in range(self.n_cities)]
         
         for u, v, weight in mst_edges:
@@ -108,7 +96,6 @@ class TSPMSTFixed:
         return adj_list
     
     def dfs_tour(self, adj_list, start=0):
-        """DFS para gerar tour"""
         visited = [False] * self.n_cities
         tour = []
         
@@ -123,7 +110,6 @@ class TSPMSTFixed:
         return tour
     
     def calculate_tour_cost(self, tour):
-        """Calcula custo do tour"""
         if len(tour) != self.n_cities:
             print(f"❌ ERRO: Tour tem {len(tour)} cidades, deveria ter {self.n_cities}")
             print(f"Tour: {tour}")
@@ -132,29 +118,25 @@ class TSPMSTFixed:
         cost = 0
         for i in range(len(tour) - 1):
             cost += self.matrix[tour[i]][tour[i + 1]]
-        cost += self.matrix[tour[-1]][tour[0]]  # Volta ao início
+        cost += self.matrix[tour[-1]][tour[0]]
         
         return cost
     
+    # Resolve TSP usando MST - versão determinística para comparação
     def solve(self):
-        """Resolve TSP usando MST"""
         print(f"\n🚀 Resolvendo TSP com {self.n_cities} cidades")
         start_time = time.time()
         
-        # 1. Constrói MST
         mst_edges = self.find_mst_simple()
         
         if len(mst_edges) != self.n_cities - 1:
             print(f"❌ ERRO: MST deveria ter {self.n_cities - 1} arestas, mas tem {len(mst_edges)}")
             return None
         
-        # 2. Constrói adjacência
         adj_list = self.build_adjacency_from_mst(mst_edges)
         
-        # 3. Faz DFS
         tour = self.dfs_tour(adj_list)
         
-        # 4. Calcula custo
         cost = self.calculate_tour_cost(tour)
         
         end_time = time.time()
