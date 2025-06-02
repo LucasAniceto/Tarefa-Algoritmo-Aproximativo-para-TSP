@@ -6,7 +6,6 @@
 
 #define MAX_CITIES 50
 
-// Declaração antecipada da função factorial
 long long factorial(int n);
 
 typedef struct {
@@ -28,7 +27,6 @@ TSPData* read_tsp_file(const char* filename) {
     
     TSPData *data = malloc(sizeof(TSPData));
     
-    // Primeiro, contamos o número de cidades lendo a primeira linha
     char line[10000];
     if (fgets(line, sizeof(line), file) == NULL) {
         printf("Erro ao ler primeira linha\n");
@@ -47,7 +45,6 @@ TSPData* read_tsp_file(const char* filename) {
     data->best_cost = INT_MAX;
     data->permutations_tested = 0;
     
-    // Aloca memória para a matriz
     data->matrix = malloc(data->n_cities * sizeof(int*));
     for (int i = 0; i < data->n_cities; i++) {
         data->matrix[i] = malloc(data->n_cities * sizeof(int));
@@ -55,16 +52,13 @@ TSPData* read_tsp_file(const char* filename) {
     
     data->best_path = malloc(data->n_cities * sizeof(int));
     
-    // Volta ao início do arquivo
     rewind(file);
     
-    // Lê a matriz
     for (int i = 0; i < data->n_cities; i++) {
         for (int j = 0; j < data->n_cities; j++) {
             if (fscanf(file, "%d", &data->matrix[i][j]) != 1) {
                 printf("Erro ao ler matriz na posição [%d][%d]\n", i, j);
                 fclose(file);
-                // Libera memória alocada
                 for (int k = 0; k <= i; k++) {
                     free(data->matrix[k]);
                 }
@@ -86,12 +80,10 @@ int calculate_path_cost(TSPData *data, int *path) {
     for (int i = 0; i < data->n_cities - 1; i++) {
         total_cost += data->matrix[path[i]][path[i + 1]];
     }
-    // Volta ao início
     total_cost += data->matrix[path[data->n_cities - 1]][path[0]];
     return total_cost;
 }
 
-// Função para trocar dois elementos
 void swap(int *a, int *b) {
     int temp = *a;
     *a = *b;
@@ -103,7 +95,6 @@ void generate_all_permutations(TSPData *data, int *path, int size, int start_ind
     if (start_index == size) {
         data->permutations_tested++;
         
-        // Testa esta permutação completa
         int cost = calculate_path_cost(data, path);
         if (cost < data->best_cost) {
             data->best_cost = cost;
@@ -112,7 +103,6 @@ void generate_all_permutations(TSPData *data, int *path, int size, int start_ind
                    cost, data->permutations_tested);
         }
         
-        // Mostra progresso a cada 1 milhão de permutações
         if (data->permutations_tested % 1000000 == 0) {
             printf("Progresso: %lld permutações testadas...\n", data->permutations_tested);
         }
@@ -123,15 +113,14 @@ void generate_all_permutations(TSPData *data, int *path, int size, int start_ind
     for (int i = start_index; i < size; i++) {
         swap(&path[start_index], &path[i]);
         generate_all_permutations(data, path, size, start_index + 1);
-        swap(&path[start_index], &path[i]); // backtrack
+        swap(&path[start_index], &path[i]);
     }
 }
 
-// Algoritmo de Força Bruta usando TODAS as permutações (n!)
+// Algoritmo de Força Bruta SEM OTIMIZAÇÃO - usa TODAS as permutações (n!)
 void solve_tsp_brute_force_full(TSPData *data) {
     clock_t start_time = clock();
     
-    // Cria array com todas as cidades (0, 1, 2, ..., n-1)
     int *path = malloc(data->n_cities * sizeof(int));
     for (int i = 0; i < data->n_cities; i++) {
         path[i] = i;
@@ -142,7 +131,6 @@ void solve_tsp_brute_force_full(TSPData *data) {
     printf("⚠️  AVISO: Esta versão testa TODAS as permutações (%d!)\n", data->n_cities);
     printf("⚠️  A versão otimizada testaria apenas %lld permutações\n", factorial(data->n_cities - 1));
     
-    // Inicializa melhor solução com primeira permutação
     data->best_cost = calculate_path_cost(data, path);
     memcpy(data->best_path, path, data->n_cities * sizeof(int));
     
@@ -155,7 +143,6 @@ void solve_tsp_brute_force_full(TSPData *data) {
     free(path);
 }
 
-// Função auxiliar para calcular fatorial (para estatísticas)
 long long factorial(int n) {
     if (n <= 1) return 1;
     long long result = 1;
@@ -165,7 +152,6 @@ long long factorial(int n) {
     return result;
 }
 
-// Função para imprimir resultados
 void print_results(TSPData *data, const char* filename) {
     printf("\n=== RESULTADOS FORÇA BRUTA COMPLETA (n!) ===\n");
     printf("Arquivo: %s\n", filename);
@@ -188,7 +174,6 @@ void print_results(TSPData *data, const char* filename) {
            (double)data->permutations_tested / optimized_perms);
 }
 
-// Função para salvar resultados em arquivo
 void save_results(TSPData *data, const char* filename, const char* output_file) {
     FILE *file = fopen(output_file, "a");
     if (file) {
@@ -199,7 +184,6 @@ void save_results(TSPData *data, const char* filename, const char* output_file) 
     }
 }
 
-// Função para liberar memória
 void free_tsp_data(TSPData *data) {
     for (int i = 0; i < data->n_cities; i++) {
         free(data->matrix[i]);
@@ -221,7 +205,6 @@ int main(int argc, char *argv[]) {
         return 1;
     }
     
-    // Verifica se é viável executar (limite ainda mais restrito)
     if (data->n_cities > 10) {
         printf("⚠️  AVISO CRÍTICO: %d cidades com %d! permutações pode demorar MUITO!\n", 
                data->n_cities, data->n_cities);

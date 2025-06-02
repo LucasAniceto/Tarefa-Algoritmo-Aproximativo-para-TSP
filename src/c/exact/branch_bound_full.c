@@ -26,7 +26,7 @@ typedef struct {
     int bound;
 } Node;
 
-// Função para ler a matriz de adjacência (mesmo do otimizado)
+// Função para ler a matriz de adjacência do arquivo
 TSPData* read_tsp_file(const char* filename) {
     FILE *file = fopen(filename, "r");
     if (!file) {
@@ -36,7 +36,6 @@ TSPData* read_tsp_file(const char* filename) {
     
     TSPData *data = malloc(sizeof(TSPData));
     
-    // Conta número de cidades
     char line[10000];
     if (fgets(line, sizeof(line), file) == NULL) {
         printf("Erro ao ler primeira linha\n");
@@ -56,21 +55,18 @@ TSPData* read_tsp_file(const char* filename) {
     data->nodes_explored = 0;
     data->nodes_pruned = 0;
     
-    // Aloca memória
     data->matrix = malloc(data->n_cities * sizeof(int*));
     for (int i = 0; i < data->n_cities; i++) {
         data->matrix[i] = malloc(data->n_cities * sizeof(int));
     }
     data->best_path = malloc(data->n_cities * sizeof(int));
     
-    // Lê matriz
     rewind(file);
     for (int i = 0; i < data->n_cities; i++) {
         for (int j = 0; j < data->n_cities; j++) {
             if (fscanf(file, "%d", &data->matrix[i][j]) != 1) {
                 printf("Erro ao ler matriz na posição [%d][%d]\n", i, j);
                 fclose(file);
-                // Libera memória alocada
                 for (int k = 0; k <= i; k++) {
                     free(data->matrix[k]);
                 }
@@ -86,13 +82,10 @@ TSPData* read_tsp_file(const char* filename) {
     return data;
 }
 
-// *** FUNÇÃO DE BOUND SEM OTIMIZAÇÃO ***
-// Calcula lower bound mais simples (menos eficiente)
+// Função de bound SEM OTIMIZAÇÃO
 int calculate_bound_unoptimized(TSPData *data, Node *node) {
     int bound = node->current_cost;
     
-    // Para cada cidade não visitada, adiciona menor aresta 
-    // (sem otimizações sofisticadas da versão normal)
     for (int i = 0; i < data->n_cities; i++) {
         if (!node->visited[i]) {
             int min_edge = INT_MAX;
@@ -110,20 +103,17 @@ int calculate_bound_unoptimized(TSPData *data, Node *node) {
     return bound;
 }
 
-// *** FUNÇÃO RECURSIVA QUE TESTA TODAS AS PERMUTAÇÕES (N!) ***
+// Função recursiva que testa TODAS as permutações (N!)
 void branch_and_bound_recursive_full(TSPData *data, Node *current_node) {
     data->nodes_explored++;
     
-    // Mostra progresso a cada 1 milhão de nós
     if (data->nodes_explored % 1000000 == 0) {
         printf("Progresso: %lld nós explorados, %lld podados (%.2f%% poda)\n", 
                data->nodes_explored, data->nodes_pruned,
                (double)data->nodes_pruned / (data->nodes_explored + data->nodes_pruned) * 100);
     }
     
-    // Se chegamos ao final do caminho
     if (current_node->level == data->n_cities) {
-        // Adiciona o custo de volta ao início
         int final_cost = current_node->current_cost + 
                         data->matrix[current_node->path[current_node->level - 1]][current_node->path[0]];
         
@@ -135,37 +125,29 @@ void branch_and_bound_recursive_full(TSPData *data, Node *current_node) {
         return;
     }
     
-    // *** MUDANÇA PRINCIPAL: EXPLORA TODAS AS CIDADES (0 até n-1) ***
-    // Na versão otimizada, começaria de 1 (fixando 0)
-    // Aqui testamos TODAS as permutações, incluindo diferentes pontos de partida
+    // SEM OTIMIZAÇÃO: explora TODAS as cidades (0 até n-1)
     for (int i = 0; i < data->n_cities; i++) {
         if (!current_node->visited[i]) {
-            // Cria novo nó
             Node next_node;
             next_node.path = malloc(data->n_cities * sizeof(int));
             next_node.visited = malloc(data->n_cities * sizeof(bool));
             
-            // Copia estado atual
             memcpy(next_node.path, current_node->path, data->n_cities * sizeof(int));
             memcpy(next_node.visited, current_node->visited, data->n_cities * sizeof(bool));
             
-            // Atualiza novo estado
             next_node.path[current_node->level] = i;
             next_node.visited[i] = true;
             next_node.level = current_node->level + 1;
             
-            // Calcula custo (cuidado com primeiro nível)
             if (current_node->level == 0) {
-                next_node.current_cost = 0;  // Primeira cidade, sem custo
+                next_node.current_cost = 0;
             } else {
                 next_node.current_cost = current_node->current_cost + 
                                        data->matrix[current_node->path[current_node->level - 1]][i];
             }
             
-            // Calcula bound (versão menos otimizada)
             next_node.bound = calculate_bound_unoptimized(data, &next_node);
             
-            // Poda: se bound >= melhor solução atual, não explora
             if (next_node.bound < data->best_cost) {
                 branch_and_bound_recursive_full(data, &next_node);
             } else {
@@ -178,21 +160,19 @@ void branch_and_bound_recursive_full(TSPData *data, Node *current_node) {
     }
 }
 
-// *** ALGORITMO PRINCIPAL QUE USA N! PERMUTAÇÕES ***
+// Algoritmo Branch and Bound SEM OTIMIZAÇÃO - usa N! permutações
 void solve_tsp_branch_bound_full_factorial(TSPData *data) {
     clock_t start_time = clock();
     
     printf("=== INICIANDO BRANCH AND BOUND N! (SEM OTIMIZAÇÃO) ===\n");
     printf("Número de cidades: %d\n", data->n_cities);
     
-    // Calcula fatorial para mostrar magnitude
     long long factorial = 1;
     for (int i = 2; i <= data->n_cities; i++) {
         factorial *= i;
     }
     printf("Permutações teóricas a explorar: %lld (%d!)\n", factorial, data->n_cities);
     
-    // Comparação com versão otimizada
     long long factorial_optimized = 1;
     for (int i = 2; i <= data->n_cities - 1; i++) {
         factorial_optimized *= i;
@@ -217,20 +197,18 @@ void solve_tsp_branch_bound_full_factorial(TSPData *data) {
     
     printf("\nIniciando busca...\n");
     
-    // *** INICIALIZA NÓ RAIZ VAZIO (SEM FIXAR CIDADE) ***
+    // Inicializa nó raiz VAZIO (sem fixar cidade)
     Node root;
     root.path = malloc(data->n_cities * sizeof(int));
     root.visited = malloc(data->n_cities * sizeof(bool));
     
-    // Diferente da versão otimizada, não fixa cidade 0
     for (int i = 0; i < data->n_cities; i++) {
-        root.visited[i] = false;  // Nenhuma cidade visitada inicialmente
+        root.visited[i] = false;
     }
     root.current_cost = 0;
-    root.level = 0;  // Começa do nível 0 (sem nenhuma cidade)
+    root.level = 0;
     root.bound = calculate_bound_unoptimized(data, &root);
     
-    // Inicia busca recursiva (explorará TODAS as permutações)
     branch_and_bound_recursive_full(data, &root);
     
     clock_t end_time = clock();
@@ -240,7 +218,6 @@ void solve_tsp_branch_bound_full_factorial(TSPData *data) {
     free(root.visited);
 }
 
-// Função para imprimir resultados
 void print_results(TSPData *data, const char* filename) {
     printf("\n=== RESULTADOS BRANCH AND BOUND N! (SEM OTIMIZAÇÃO) ===\n");
     printf("Arquivo: %s\n", filename);
@@ -273,7 +250,6 @@ void print_results(TSPData *data, const char* filename) {
            (double)data->nodes_explored / factorial_opt);
 }
 
-// Função para salvar resultados
 void save_results(TSPData *data, const char* filename, const char* output_file) {
     FILE *file = fopen(output_file, "a");
     if (file) {
@@ -284,7 +260,6 @@ void save_results(TSPData *data, const char* filename, const char* output_file) 
     }
 }
 
-// Função para liberar memória
 void free_tsp_data(TSPData *data) {
     for (int i = 0; i < data->n_cities; i++) {
         free(data->matrix[i]);
