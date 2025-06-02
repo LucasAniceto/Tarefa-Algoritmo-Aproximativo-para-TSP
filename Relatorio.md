@@ -46,41 +46,41 @@ Garantia teórica de no máximo 2× o valor ótimo. Passos: (1) Construir MST co
 
 ### 2.1 Algoritmos Exatos - Força Bruta (Com Otimização (n-1)!)
 
-| Arquivo        | Cidades | C (s)        | Python (s)   | Speedup C vs Python |
-| -------------- | ------- | ------------ | ------------ | ------------------- |
-| tsp2_1248.txt  | 6       | 0.000000     | 0.000086     |                     |
-| tsp1_253.txt   | 11      | 0.166600     | 1.481049     |                     |
-| tsp3_1194.txt  | 15      | 8270         | 80298        |                     |
-| tsp5_27603.txt | 29      | Impraticável | Impraticável |                     |
-| tsp4_7013.txt  | 44      | Impraticável | Impraticável |                     |
+| Arquivo        | Cidades | C (s)        | Python (s)   | Speedup C vs Python      |
+| -------------- | ------- | ------------ | ------------ | ------------------------ |
+| tsp2_1248.txt  | 6       | 0.0000008    | 0.000086     | 107.50x                  |
+| tsp1_253.txt   | 11      | 0.166600     | 1.481049     | 8.89x                    |
+| tsp3_1194.txt  | 15      | 8270         | 80298        | 9.71x                    |
+| tsp5_27603.txt | 29      | Impraticável | Impraticável | ------------------------ |
+| tsp4_7013.txt  | 44      | Impraticável | Impraticável | ------------------------ |
 ### 2.2 Algoritmos Exatos - Força Bruta (Sem Otimização (n)!)
 
-| Arquivo        | Cidades | C (s)        | Python (s)   | Speedup C vs Python |
-| -------------- | ------- | ------------ | ------------ | ------------------- |
-| tsp2_1248.txt  | 6       | 0.000000     | 0.000264     |                     |
-| tsp1_253.txt   | 11      | 0.912000     | 14.970555    |                     |
-| tsp3_1194.txt  | 15      | 34409.482    | 15 dias +/-  |                     |
-| tsp5_27603.txt | 29      | Impraticável | Impraticável |                     |
-| tsp4_7013.txt  | 44      | Impraticável | Impraticável |                     |
+| Arquivo        | Cidades | C (s)        | Python (s)   | Speedup C vs Python      |
+| -------------- | ------- | ------------ | ------------ | ------------------------ |
+| tsp2_1248.txt  | 6       | 0.0000008    | 0.000264     | 330.00x                  |
+| tsp1_253.txt   | 11      | 0.912000     | 14.970555    | 16.42x                   |
+| tsp3_1194.txt  | 15      | 34409.482    | 15 dias +/-  | 37.66X                   |
+| tsp5_27603.txt | 29      | Impraticável | Impraticável | ------------------------ |
+| tsp4_7013.txt  | 44      | Impraticável | Impraticável | ------------------------ |
 
 ### 2.3 Algoritmos Exatos - Branch and Bound (Com Otimização (n-1)!)
 
-| Arquivo        | Cidades | C (s)        | Python (s)   | Speedup C vs Python |
-| -------------- | ------- | ------------ | ------------ | ------------------- |
-| tsp2_1248.txt  | 6       | 0.000025     | 0.000097     |                     |
-| tsp1_253.txt   | 11      | 0.024399     | 0.747899     |                     |
-| tsp3_1194.txt  | 15      | 0.144095     | 3.165765     |                     |
-| tsp5_27603.txt | 29      | Impraticável | Impraticável |                     |
-| tsp4_7013.txt  | 44      | Impraticável | Impraticável |                     |
+| Arquivo        | Cidades | C (s)        | Python (s)   | Speedup C vs Python      |
+| -------------- | ------- | ------------ | ------------ | ------------------------ |
+| tsp2_1248.txt  | 6       | 0.000025     | 0.000097     | 3.88x                    |
+| tsp1_253.txt   | 11      | 0.024399     | 0.747899     | 30.65x                   |
+| tsp3_1194.txt  | 15      | 0.144095     | 3.165765     | 21.97x                   |
+| tsp5_27603.txt | 29      | Impraticável | Impraticável | ------------------------ |
+| tsp4_7013.txt  | 44      | Impraticável | Impraticável | ------------------------ |
 ### 2.4 Algoritmos Exatos - Branch and Bound (Sem Otimização (n)!)
 
-| Arquivo        | Cidades | C (s)        | Python (s)   | Speedup C vs Python |
-| -------------- | ------- | ------------ | ------------ | ------------------- |
-| tsp2_1248.txt  | 6       | 0.000103     | 0.001059     |                     |
-| tsp1_253.txt   | 11      | 0.581025     | 24.571292    |                     |
-| tsp3_1194.txt  | 15      | 3.854390     | 176.354653   |                     |
-| tsp5_27603.txt | 29      | Impraticável | Impraticável |                     |
-| tsp4_7013.txt  | 44      | Impraticável | Impraticável |                     |
+| Arquivo        | Cidades | C (s)        | Python (s)   | Speedup C vs Python      |
+| -------------- | ------- | ------------ | ------------ | ------------------------ |
+| tsp2_1248.txt  | 6       | 0.000103     | 0.001059     | 10.28x                   |
+| tsp1_253.txt   | 11      | 0.581025     | 24.571292    | 42.29x                   |
+| tsp3_1194.txt  | 15      | 3.854390     | 176.354653   | 45.75x                   |
+| tsp5_27603.txt | 29      | Impraticável | Impraticável | ------------------------ |
+| tsp4_7013.txt  | 44      | Impraticável | Impraticável | ------------------------ |
 
 ### 2.2 Análise de Otimização - TSP3 (15 cidades)
 
@@ -92,23 +92,23 @@ Garantia teórica de no máximo 2× o valor ótimo. Passos: (1) Construir MST co
 
 ### 2.3 Algoritmo MST - Resultados Completos
 
-| Arquivo        | Cidades | Ótimo | C Custo | C Tempo  | Python Custo | Python Tempo | Razão | Speedup C/Python |
-| -------------- | ------- | ----- | ------- | -------- | ------------ | ------------ | ----- | ---------------- |
-| tsp1_253.txt   | 11      | 253   | 281     | 0.000028 | 269          | 0.000113     | 1.063 |                  |
-| tsp2_1248.txt  | 6       | 1248  | 1272    | 0.000029 | 1272         | 0.000099     | 1.019 |                  |
-| tsp3_1194.txt  | 15      | 1194  | 1519    | 0.000028 | 1424         | 0.000112     | 1.193 |                  |
-| tsp4_7013.txt  | 44      | 7013  | 9038    | 0.000043 | 8402         | 0.000436     | 1.198 |                  |
-| tsp5_27603.txt | 29      | 27603 | 35019   | 0.000029 | 34902        | 0.000226     | 1.264 |                  |
+| Arquivo        | Cidades | Ótimo | C Custo | Razão C | C Tempo  | Python Custo | Razão Python | Python Tempo | Speedup C/Python |
+| -------------- | ------- | ----- | ------- | ------- | -------- | ------------ | ------------ | ------------ | ---------------- |
+| tsp1_253.txt   | 11      | 253   | 281     | 1.110   | 0.000028 | 269          | 1.063        | 0.000113     | 4.04x            |
+| tsp2_1248.txt  | 6       | 1248  | 1272    | 1.019   | 0.000029 | 1272         | 1.019        | 0.000099     | 3.41x            |
+| tsp3_1194.txt  | 15      | 1194  | 1519    | 1.272   | 0.000028 | 1424         | 1.192        | 0.000112     | 4.00x            |
+| tsp4_7013.txt  | 44      | 7013  | 9038    | 1.288   | 0.000043 | 8402         | 1.198        | 0.000436     | 10.14x           |
+| tsp5_27603.txt | 29      | 27603 | 35019   | 1.268   | 0.000029 | 34902        | 1.264        | 0.000226     | 7.79x            |
 
 **Observação:** . esse d baixo eh o outro algo q roda igual o de c
 
-| Arquivo        | Cidades | Ótimo | C Custo | C Tempo  | Python Custo | Python Tempo | Razão | Speedup C/Python |
-| -------------- | ------- | ----- | ------- | -------- | ------------ | ------------ | ----- | ---------------- |
-| tsp1_253.txt   | 11      | 253   | 281     | 0.000028 | 281          | 0.001439     | 1.063 |                  |
-| tsp2_1248.txt  | 6       | 1248  | 1272    | 0.000029 | 1272         | 0.000695     | 1.019 |                  |
-| tsp3_1194.txt  | 15      | 1194  | 1519    | 0.000028 | 1519         | 0.002386     | 1.193 |                  |
-| tsp4_7013.txt  | 44      | 7013  | 9038    | 0.000043 | 9038         | 0.010062     | 1.198 |                  |
-| tsp5_27603.txt | 29      | 27603 | 35019   | 0.000029 | 35019        | 0.007862     | 1.264 |                  |
+| Arquivo        | Cidades | Ótimo | C Custo | C Tempo  | Python Custo | Python Tempo | Speedup C/Python | Razão |
+| -------------- | ------- | ----- | ------- | -------- | ------------ | ------------ | ---------------- | ----- |
+| tsp1_253.txt   | 11      | 253   | 281     | 0.000028 | 281          | 0.001439     | 51.39x           | 1.11  |
+| tsp2_1248.txt  | 6       | 1248  | 1272    | 0.000029 | 1272         | 0.000695     | 23.97x           | 1.02  |
+| tsp3_1194.txt  | 15      | 1194  | 1519    | 0.000028 | 1519         | 0.002386     | 85.21x           | 1.27  |
+| tsp4_7013.txt  | 44      | 7013  | 9038    | 0.000043 | 9038         | 0.010062     | 234.00x          | 1.29  |
+| tsp5_27603.txt | 29      | 27603 | 35019   | 0.000029 | 35019        | 0.007862     | 271.10x          | 1.27  |
 
 **Observação:** .
 
@@ -249,17 +249,6 @@ python3 src/python/exact/branch_bound_python_full.py data/tspX_X.txt
 python3 src/python/approximate/mst_algorithm.py data/tspX_X.txt
 ```
 ---
-
-## Notas Importantes
-
-- **TSP3 (15 cidades)**: Pode demorar 17+ horas. Use `nohup` ou `screen`
-- **Timeouts**: Scripts têm timeouts configurados por complexidade
-- **Resultados**: Salvos automaticamente em `results/`
-- **Logs**: Cada execução gera logs detalhados para análise
-- **Performance**: C > Java > Python para algoritmos exatos
-- **Escalabilidade**: Apenas MST é viável para n > 15
----
-
 ## CÁLCULOS
 
 - **Razão = custo_encontrado / valor_ótimo**
