@@ -1,7 +1,3 @@
-# Makefile principal do projeto TSP
-# Compila todos os componentes e executa testes
-# Funciona com diretório "Tarefa-Algoritmo-Aproximativo-para-TSP"
-
 .PHONY: all clean test setup run-all help c-only python-only quick-test check-files manual-compile debug-compile
 
 # Configurações
@@ -10,14 +6,12 @@ CFLAGS = -Wall -Wextra -O3 -std=c99
 PROJECT_ROOT := $(shell pwd)
 PROJECT_NAME := $(shell basename $(PROJECT_ROOT))
 
-# Caminhos ajustados para funcionar independente do nome do diretório
 C_EXACT_DIR = src/c/exact
 C_APPROX_DIR = src/c/approximate
 BIN_DIR = bin
 DATA_DIR = data
 RESULTS_DIR = results
 
-# Verifica se estamos no diretório correto
 check-structure:
 	@echo "🔍 Verificando estrutura do projeto..."
 	@echo "Diretório atual: $(PROJECT_ROOT)"
@@ -35,7 +29,6 @@ check-structure:
 	fi
 	@echo "✅ Estrutura verificada"
 
-# Lista arquivos C encontrados
 check-files: check-structure
 	@echo "📄 Verificando arquivos C..."
 	@echo "Arquivos .c encontrados:"
@@ -53,18 +46,15 @@ check-files: check-structure
 		fi; \
 	done
 
-# Configuração inicial
 setup: check-structure
 	@echo "🔧 Configurando ambiente..."
 	@mkdir -p $(BIN_DIR) $(RESULTS_DIR)
 	@echo "✅ Diretórios $(BIN_DIR)/ e $(RESULTS_DIR)/ criados"
 
-# Compilação manual como fallback
 manual-compile: setup
 	@echo "🔨 Compilação manual dos arquivos C..."
 	@echo "Tentando compilar cada arquivo individualmente..."
 	
-	# Compila brute_force.c
 	@if [ -f "$(C_EXACT_DIR)/brute_force.c" ]; then \
 		echo "  🔹 Compilando brute_force.c..."; \
 		if $(CC) $(CFLAGS) "$(C_EXACT_DIR)/brute_force.c" -o "$(BIN_DIR)/brute_force" 2>/dev/null; then \
@@ -78,7 +68,6 @@ manual-compile: setup
 		echo "  ⚠️  $(C_EXACT_DIR)/brute_force.c não encontrado"; \
 	fi
 	
-	# Compila branch_bound.c
 	@if [ -f "$(C_EXACT_DIR)/branch_bound.c" ]; then \
 		echo "  🔹 Compilando branch_bound.c..."; \
 		if $(CC) $(CFLAGS) "$(C_EXACT_DIR)/branch_bound.c" -o "$(BIN_DIR)/branch_bound" 2>/dev/null; then \
@@ -92,7 +81,6 @@ manual-compile: setup
 		echo "  ⚠️  $(C_EXACT_DIR)/branch_bound.c não encontrado"; \
 	fi
 	
-	# Compila mst_approx.c
 	@if [ -f "$(C_APPROX_DIR)/mst_approx.c" ]; then \
 		echo "  🔹 Compilando mst_approx.c..."; \
 		if $(CC) $(CFLAGS) "$(C_APPROX_DIR)/mst_approx.c" -o "$(BIN_DIR)/mst_approx" 2>/dev/null; then \
@@ -106,7 +94,6 @@ manual-compile: setup
 		echo "  ⚠️  $(C_APPROX_DIR)/mst_approx.c não encontrado"; \
 	fi
 	
-	# Compila arquivos extras se existirem
 	@if [ -f "$(C_EXACT_DIR)/brute_force_full.c" ]; then \
 		echo "  🔹 Compilando brute_force_full.c..."; \
 		$(CC) $(CFLAGS) "$(C_EXACT_DIR)/brute_force_full.c" -o "$(BIN_DIR)/brute_force_full" 2>/dev/null && \
@@ -125,12 +112,10 @@ manual-compile: setup
 	@echo "📊 Executáveis compilados:"
 	@ls -la $(BIN_DIR)/ 2>/dev/null | grep -v "^total" | sed 's/^/  /' || echo "  (nenhum executável encontrado)"
 
-# Compilação com debug
 debug-compile: setup
 	@echo "🐛 Compilação com debug..."
 	@$(MAKE) manual-compile CFLAGS="-Wall -Wextra -g -DDEBUG -std=c99"
 
-# Compilação de programas C (tenta usar Makefiles internos, fallback para manual)
 c-programs: setup
 	@echo "🔨 Compilando programas C..."
 	@$(MAKE) c-exact
@@ -171,19 +156,16 @@ c-approx:
 		echo "    ❌ Diretório $(C_APPROX_DIR) não encontrado"; \
 	fi
 
-# Testes rápidos com verificações robustas
 quick-test: check-structure
 	@echo "🧪 Executando testes rápidos..."
 	@echo ""
 	
-	# Verifica se tem pelo menos um executável
 	@if [ ! -f "$(BIN_DIR)/mst_approx" ] && [ ! -f "$(BIN_DIR)/brute_force" ] && [ ! -f "$(BIN_DIR)/branch_bound" ]; then \
 		echo "⚠️  Nenhum executável encontrado. Compilando primeiro..."; \
 		$(MAKE) manual-compile; \
 		echo ""; \
 	fi
 	
-	# Escolhe arquivo de teste
 	@TEST_FILE=""; \
 	if [ -f "$(DATA_DIR)/tsp2_1248.txt" ]; then \
 		TEST_FILE="$(DATA_DIR)/tsp2_1248.txt"; \
@@ -219,7 +201,6 @@ quick-test: check-structure
 		ls -la $(DATA_DIR)/ 2>/dev/null | sed 's/^/     /' || echo "     (diretório vazio)"; \
 	fi
 
-# Teste completo
 test: quick-test
 	@echo ""
 	@echo "🧪 Executando bateria de testes..."
@@ -231,7 +212,6 @@ test: quick-test
 		cd $(C_APPROX_DIR) && $(MAKE) test-small 2>/dev/null || echo "  ⚠️  Teste interno falhou"; \
 	fi
 
-# Execução completa dos experimentos
 run-all: c-programs
 	@echo "🚀 Iniciando experimentos completos..."
 	@if [ -f "run_experiments.py" ]; then \
@@ -243,7 +223,6 @@ run-all: c-programs
 		$(MAKE) c-only; \
 	fi
 
-# Apenas experimentos C
 c-only: c-programs
 	@echo "🔬 Executando apenas experimentos C..."
 	@for file in $(DATA_DIR)/tsp*.txt; do \
@@ -258,7 +237,6 @@ c-only: c-programs
 		fi; \
 	done
 
-# Apenas experimentos Python
 python-only:
 	@echo "🐍 Executando apenas experimentos Python..."
 	@if [ -f "src/python/approximate/main.py" ]; then \
@@ -275,7 +253,6 @@ python-only:
 		echo "❌ Scripts Python não encontrados"; \
 	fi
 
-# Limpeza
 clean:
 	@echo "🧹 Limpando arquivos..."
 	@rm -f $(BIN_DIR)/* 2>/dev/null || true
@@ -288,7 +265,6 @@ clean:
 	@rm -f $(RESULTS_DIR)/*.txt $(RESULTS_DIR)/*.json $(RESULTS_DIR)/*.png 2>/dev/null || true
 	@echo "✅ Limpeza concluída"
 
-# Verificação do ambiente
 check: check-structure
 	@echo "🔍 Verificando ambiente completo..."
 	@echo ""
@@ -318,7 +294,6 @@ check: check-structure
 	@python3 -c "import pandas; print('  ✅ pandas')" 2>/dev/null || echo "  ❌ pandas não encontrado"
 	@python3 -c "import numpy; print('  ✅ numpy')" 2>/dev/null || echo "  ❌ numpy não encontrado"
 
-# Instalação de dependências (Ubuntu/Debian)
 install-deps:
 	@echo "📦 Instalando dependências..."
 	sudo apt update
@@ -326,7 +301,6 @@ install-deps:
 	pip3 install matplotlib pandas numpy
 	@echo "✅ Dependências instaladas"
 
-# Benchmark rápido
 benchmark: c-programs
 	@echo "⏱️  Executando benchmark..."
 	@echo "Arquivo,Algoritmo,Tempo(s),Custo" > $(RESULTS_DIR)/benchmark.csv
@@ -340,7 +314,6 @@ benchmark: c-programs
 	done
 	@echo "Benchmark salvo em $(RESULTS_DIR)/benchmark.csv"
 
-# Demonstração
 demo: c-programs
 	@echo "🎬 Demonstração do projeto TSP..."
 	@echo ""
@@ -359,7 +332,6 @@ demo: c-programs
 		"$(BIN_DIR)/mst_approx" "$(DATA_DIR)/tsp4_7013.txt" 2>/dev/null || echo "   Erro na execução"; \
 	fi
 
-# Alvo principal
 all: setup c-programs
 	@echo ""
 	@echo "🎉 Compilação completa concluída!"
@@ -371,7 +343,6 @@ all: setup c-programs
 	@echo "  make c-only      - Experimentos C"
 	@echo "  make python-only - Experimentos Python"
 
-# Ajuda
 help:
 	@echo "🆘 Comandos disponíveis para Tarefa-Algoritmo-Aproximativo-para-TSP:"
 	@echo ""
